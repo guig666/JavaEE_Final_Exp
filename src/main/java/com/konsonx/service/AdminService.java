@@ -4,19 +4,122 @@ import com.konsonx.po.Admin;
 
 import java.util.List;
 
+/**
+ * =====================================================
+ * 管理员服务接口
+ * =====================================================
+ * 功能说明：
+ * 1. 管理员增删改查（插入、删除、更新、按ID查询）
+ * 2. 管理员登录验证
+ * 3. 按账号模糊分页查询
+ * 4. 按账号精确查询
+ * 5. 分页查询所有管理员
+ * =====================================================
+ */
 public interface AdminService {
-    public boolean insert(Admin admin);
-    public boolean delete(Integer id);
-    public boolean update(Admin admin);
-    public Admin selectById(Integer id);
-    public boolean login(String account,String password);
-    public List<Admin> selectByAccount(String account, Integer pageNum, Integer pageSize);
-    public Admin selectByAccount(String account);
+
     /**
+     * =====================================================
+     * 新增管理员
+     * =====================================================
+     * 核心逻辑：
+     * 1. 调用Mapper层插入管理员记录
+     * 2. 返回操作是否成功
      *
-     * @param pageNum 从1开始
-     * @param pageSize 如果pageSize 为0 则不分页
-     * @return list
+     * @param admin 管理员对象（包含账号、密码等信息）
+     * @return true-插入成功，false-插入失败
      */
-    public List<Admin> selectByPage(Integer pageNum,Integer pageSize);
+    public boolean insert(Admin admin);
+
+    /**
+     * =====================================================
+     * 删除管理员
+     * =====================================================
+     * 核心逻辑：
+     * 1. 根据管理员ID删除对应记录
+     *
+     * @param id 管理员ID
+     * @return true-删除成功，false-删除失败
+     */
+    public boolean delete(Integer id);
+
+    /**
+     * =====================================================
+     * 更新管理员信息
+     * =====================================================
+     * 核心逻辑：
+     * 1. 根据管理员ID，选择性更新非空字段
+     *
+     * @param admin 管理员对象（ID必填，其他字段选择性更新）
+     * @return true-更新成功，false-更新失败
+     */
+    public boolean update(Admin admin);
+
+    /**
+     * =====================================================
+     * 按ID查询管理员
+     * =====================================================
+     * 核心逻辑：
+     * 1. 根据主键ID查询单个管理员完整信息
+     *
+     * @param id 管理员ID
+     * @return 管理员对象，不存在则返回null
+     */
+    public Admin selectById(Integer id);
+
+    /**
+     * =====================================================
+     * 管理员登录验证
+     * =====================================================
+     * 核心逻辑：
+     * 1. 根据账号查询管理员
+     * 2. 比对密码是否一致
+     *
+     * @param account  管理员账号
+     * @param password 管理员密码（明文比对，生产环境建议加密）
+     * @return true-账号密码正确，false-验证失败
+     */
+    public boolean login(String account, String password);
+
+    /**
+     * =====================================================
+     * 按账号模糊分页查询管理员列表
+     * =====================================================
+     * 核心逻辑：
+     * 1. 使用PageHelper进行分页
+     * 2. 按账号进行模糊匹配（like %account%）
+     *
+     * @param account  管理员账号（模糊匹配）
+     * @param pageNum  页码（从1开始）
+     * @param pageSize 每页记录数
+     * @return 管理员列表，可能为空列表
+     */
+    public List<Admin> selectByAccount(String account, Integer pageNum, Integer pageSize);
+
+    /**
+     * =====================================================
+     * 按账号精确查询管理员
+     * =====================================================
+     * 核心逻辑：
+     * 1. 根据账号精确匹配查询单个管理员
+     * 2. 用于登录验证、账号唯一性检查等场景
+     *
+     * @param account 管理员账号（精确匹配）
+     * @return 管理员对象，不存在则返回null
+     */
+    public Admin selectByAccount(String account);
+
+    /**
+     * =====================================================
+     * 分页查询所有管理员
+     * =====================================================
+     * 核心逻辑：
+     * 1. 使用PageHelper进行分页
+     * 2. 按ID倒序排列（最新的在前）
+     *
+     * @param pageNum  页码（从1开始）
+     * @param pageSize 每页记录数，如果为0则不分页
+     * @return 管理员列表，可能为空列表
+     */
+    public List<Admin> selectByPage(Integer pageNum, Integer pageSize);
 }

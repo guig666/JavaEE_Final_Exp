@@ -4,23 +4,177 @@ import com.konsonx.po.User;
 
 import java.util.List;
 
+/**
+ * =====================================================
+ * 用户服务接口
+ * =====================================================
+ * 功能说明：
+ * 1. 用户增删改查（插入、删除、更新、按ID查询）
+ * 2. 用户登录验证（手机号+密码）
+ * 3. 按手机号模糊分页查询
+ * 4. 按昵称模糊分页查询
+ * 5. 分页查询所有用户
+ * 6. 用户余额充值
+ * 7. 用户余额扣费
+ * =====================================================
+ */
 public interface UserService {
-    public boolean insert(User user);
-    public boolean delete(Integer userId);
-    public boolean update(User user);
-    public User selectById(Integer userId);
-    public User selectByPhone(String userPhone);
-    public boolean login(String phoneNumber,String password);
-    public List<User> selectByPhone(String phoneNumber,Integer pageNum,Integer pageSize);
-    public List<User> selectByAlias(String phoneAlias,Integer pageNum,Integer pageSize);
-    /**
-     *
-     * @param pageNum 从1开始
-     * @param pageSize 如果pageSize 为0 则不分页
-     * @return list
-     */
-    public List<User> selectByPage(Integer pageNum,Integer pageSize);
 
-    public boolean recharge(Integer userId,Float money);
-    public boolean deduct(Integer userId,Float cost);
+    /**
+     * =====================================================
+     * 新增用户
+     * =====================================================
+     * 核心逻辑：
+     * 1. 参数非空校验
+     * 2. 调用Mapper层插入用户记录
+     * 3. 返回操作是否成功
+     *
+     * @param user 用户对象（包含手机号、密码、昵称、余额等信息）
+     * @return true-插入成功，false-插入失败
+     */
+    public boolean insert(User user);
+
+    /**
+     * =====================================================
+     * 删除用户
+     * =====================================================
+     * 核心逻辑：
+     * 1. 根据用户ID删除对应记录
+     *
+     * @param userId 用户ID
+     * @return true-删除成功，false-删除失败
+     */
+    public boolean delete(Integer userId);
+
+    /**
+     * =====================================================
+     * 更新用户信息
+     * =====================================================
+     * 核心逻辑：
+     * 1. 参数非空校验
+     * 2. 根据用户ID，选择性更新非空字段
+     *
+     * @param user 用户对象（ID必填，其他字段选择性更新）
+     * @return true-更新成功，false-更新失败
+     */
+    public boolean update(User user);
+
+    /**
+     * =====================================================
+     * 按ID查询用户
+     * =====================================================
+     * 核心逻辑：
+     * 1. 根据主键ID查询单个用户完整信息
+     *
+     * @param userId 用户ID
+     * @return 用户对象，不存在则返回null
+     */
+    public User selectById(Integer userId);
+
+    /**
+     * =====================================================
+     * 按手机号精确查询用户
+     * =====================================================
+     * 核心逻辑：
+     * 1. 根据手机号精确匹配查询单个用户
+     * 2. 用于登录验证、账号唯一性检查等场景
+     *
+     * @param userPhone 用户手机号（精确匹配）
+     * @return 用户对象，不存在则返回null
+     */
+    public User selectByPhone(String userPhone);
+
+    /**
+     * =====================================================
+     * 用户登录验证
+     * =====================================================
+     * 核心逻辑：
+     * 1. 参数非空校验
+     * 2. 根据手机号查询用户
+     * 3. 比对密码是否一致
+     *
+     * @param phoneNumber 用户手机号
+     * @param password    用户密码（明文比对，生产环境建议加密）
+     * @return true-账号密码正确，false-验证失败
+     */
+    public boolean login(String phoneNumber, String password);
+
+    /**
+     * =====================================================
+     * 按手机号模糊分页查询用户列表
+     * =====================================================
+     * 核心逻辑：
+     * 1. 使用PageHelper进行分页
+     * 2. 按手机号进行模糊匹配（like %phoneNumber%）
+     *
+     * @param phoneNumber 用户手机号（模糊匹配）
+     * @param pageNum     页码（从1开始）
+     * @param pageSize    每页记录数
+     * @return 用户列表，可能为空列表（不含密码字段）
+     */
+    public List<User> selectByPhone(String phoneNumber, Integer pageNum, Integer pageSize);
+
+    /**
+     * =====================================================
+     * 按昵称模糊分页查询用户列表
+     * =====================================================
+     * 核心逻辑：
+     * 1. 使用PageHelper进行分页
+     * 2. 按昵称进行模糊匹配（like %alias%）
+     *
+     * @param userAlias 用户昵称（模糊匹配）
+     * @param pageNum   页码（从1开始）
+     * @param pageSize  每页记录数
+     * @return 用户列表，可能为空列表（不含密码字段）
+     */
+    public List<User> selectByAlias(String userAlias, Integer pageNum, Integer pageSize);
+
+    /**
+     * =====================================================
+     * 分页查询所有用户
+     * =====================================================
+     * 核心逻辑：
+     * 1. 使用PageHelper进行分页
+     * 2. 按ID倒序排列（最新的在前）
+     *
+     * @param pageNum  页码（从1开始）
+     * @param pageSize 每页记录数，如果为0则不分页
+     * @return 用户列表，可能为空列表（不含密码字段）
+     */
+    public List<User> selectByPage(Integer pageNum, Integer pageSize);
+
+    /**
+     * =====================================================
+     * 用户余额充值
+     * =====================================================
+     * 核心逻辑：
+     * 1. 校验充值金额不能为负数
+     * 2. 查询用户当前余额
+     * 3. 计算新余额 = 原余额 + 充值金额
+     * 4. 更新用户余额
+     * 5. 注意：更新时会清空密码和手机号字段（避免误更新）
+     *
+     * @param userId 用户ID
+     * @param money  充值金额（正数）
+     * @return true-充值成功，false-充值失败
+     */
+    public boolean recharge(Integer userId, Float money);
+
+    /**
+     * =====================================================
+     * 用户余额扣费
+     * =====================================================
+     * 核心逻辑：
+     * 1. 校验扣费金额不能为负数
+     * 2. 查询用户当前余额
+     * 3. 校验余额是否充足（扣费后不能为负数）
+     * 4. 计算新余额 = 原余额 - 扣费金额
+     * 5. 更新用户余额
+     * 6. 注意：更新时会清空密码和手机号字段（避免误更新）
+     *
+     * @param userId 用户ID
+     * @param cost   扣费金额（正数）
+     * @return true-扣费成功，false-扣费失败（余额不足或参数错误）
+     */
+    public boolean deduct(Integer userId, Float cost);
 }
