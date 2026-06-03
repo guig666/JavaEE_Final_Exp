@@ -1,16 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <configuration>
-
+    <!-- 1. 配置日志级别 -->
     <property name="LOG_HOME" value="logs" />
     <property name="LOG_PATTERN" value="%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{50} - %msg%n" />
-
+    <!-- 2. 配置日志输出到控制台 -->
     <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
         <encoder>
             <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{50} - %msg%n</pattern>
             <charset>UTF-8</charset>
         </encoder>
     </appender>
-
+    <!-- 3. 配置日志输出到文件 -->
     <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
         <file>${LOG_HOME}/powerbank.log</file>
         <encoder>
@@ -20,16 +20,16 @@
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
             <fileNamePattern>${LOG_HOME}/powerbank.%d{yyyy-MM-dd}.%i.log</fileNamePattern>
             <timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
-                <maxFileSize>100MB</maxFileSize>
+                <maxFileSize>100MB</maxFileSize>     <!-- 每个日志文件最大大小 100MB -->
             </timeBasedFileNamingAndTriggeringPolicy>
-            <maxHistory>30</maxHistory>
+            <maxHistory>30</maxHistory>  <!-- 最保留 30 天的日志文件 -->
         </rollingPolicy>
     </appender>
-
+    <!-- 4. 配置错误日志输出到文件 -->
     <appender name="ERROR_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
         <file>${LOG_HOME}/error.log</file>
         <filter class="ch.qos.logback.classic.filter.LevelFilter">
-            <level>ERROR</level>
+            <level>ERROR</level>     <!-- 只记录 ERROR 级别的日志到单独的文件 -->
             <onMatch>ACCEPT</onMatch>
             <onMismatch>DENY</onMismatch>
         </filter>
@@ -42,10 +42,10 @@
             <maxHistory>30</maxHistory>
         </rollingPolicy>
     </appender>
-
-    <logger name="com.konsonx" level="DEBUG" />
-    <logger name="org.springframework" level="INFO" />
-    <logger name="org.mybatis" level="DEBUG" />
+    <!-- 5. 配置日志级别 -->
+    <logger name="com.konsonx" level="DEBUG" />  <!-- 项目代码 DEBUG （调试级别）级别 -->
+    <logger name="org.springframework" level="INFO" />  <!-- Spring 框架 INFO （信息级别）级别 -->
+    <logger name="org.mybatis" level="DEBUG" />  <!-- MyBatis DEBUG （调试级别）级别 -->
 
     <root level="INFO">
         <appender-ref ref="CONSOLE" />

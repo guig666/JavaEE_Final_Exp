@@ -6,14 +6,20 @@
                            http://www.springframework.org/schema/beans/spring-beans.xsd
                            http://www.springframework.org/schema/context
                            http://www.springframework.org/schema/context/spring-context.xsd http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc.xsd">
-    <!--指定要扫描的包-->
+
+    <!--1. 组件扫描：扫描指定包下的所有 Spring 组件-->
     <context:component-scan base-package="com.konsonx.*"/>
+    
+    <!--2. 注解驱动（核心）：启动 Spring MVC 注解功能：完成请求和注解POJO的映射-->
     <mvc:annotation-driven >
-        <!-- 消息转换器 -->
+        <!-- 消息转换器：将请求参数转换为 POJO，将 POJO 转换为响应体 -->
         <mvc:message-converters register-defaults="true">
+            <!-- 字符串消息转换器：将请求参数转换为字符串，将字符串转换为响应体 -->
             <bean class="org.springframework.http.converter.StringHttpMessageConverter">
                 <property name="supportedMediaTypes" value="text/html;charset=UTF-8"/>
             </bean>
+
+            <!-- JSON 消息转换器：将请求参数转换为 JSON 格式，将 JSON 格式转换为响应体 -->
             <bean class="org.springframework.http.converter.json.MappingJackson2HttpMessageConverter">
                 <property name="supportedMediaTypes">
                     <list>
@@ -24,26 +30,24 @@
             </bean>
         </mvc:message-converters>
     </mvc:annotation-driven>
-    <!-- 静态资源访问 -->
+
+    <!-- 3. 静态资源访问：（图片、CSS、JS 等）的访问路径 -->
     <!--如果webapp下你新建了文件夹，想访问里面的静态资源，那么就要在这配置一下-->
     <mvc:resources location="/img/" mapping="/img/**"/>
     <mvc:resources location="/css/" mapping="/css/**"/>
     <mvc:resources location="/js/" mapping="/js/**"/>
     <mvc:resources location="/fonts/" mapping="/fonts/**"/>
     <mvc:default-servlet-handler/>
-    <!-- Configures the @Controller programming model
-    <mvc:annotation-driven />-->
-    <!-- ②：启动Spring MVC的注解功能，完成请求和注解POJO的映射 -->
 
-
-    <!-- 配置视图解析器，把控制器的逻辑视频映射为真正的视图 -->
+    <!-- 4. 配置视图解析器，把控制器的逻辑视频映射为真正的视图 -->
     <!-- /WEB-INF/jsp/start.jsp -->
     <bean class="org.springframework.web.servlet.view.InternalResourceViewResolver">
         <property name="viewClass" value="org.springframework.web.servlet.view.JstlView"/>
         <property name="prefix" value="/WEB-INF/views/"/>
         <property name="suffix" value=".html" />
     </bean>
-    <!-- 定义无Controller的path<->view直接映射 -->
+    
+    <!-- 5. 定义无Controller的path<->view直接映射 -->
     <mvc:view-controller path="/" view-name="redirect:/test.html" />
     <mvc:interceptors>
         <!-- CORS 拦截器放在最前面 -->
