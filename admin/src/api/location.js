@@ -1,7 +1,9 @@
 import request from '@/utils/request'
-
+/**
+ * 封装投放点的增删改查 API
+ */
 export default {
-  // 获取投放点列表
+  // 获取投放点列表（支持分页、搜索）
   getLocations(params) {
     return request.get('/manage/locations', { params })
   },
